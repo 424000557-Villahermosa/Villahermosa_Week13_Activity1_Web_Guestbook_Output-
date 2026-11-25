@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Guestbook</title>
+    <style>
+        :root {
+            --bg: #eef1f6;
+            --surface: #ffffff;
+            --ink: #1c2434;
+            --muted: #6b7587;
+            --line: #dde2ec;
+            --accent: #0e7c86;
+            --accent-dark: #0a5f67;
+            --accent-soft: #dff1f2;
+            --danger: #c0392b;
+            --danger-soft: #fdecea;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* ---------- App bar ---------- */
+        .appbar {
+            background: var(--ink);
+            color: #fff;
+            padding: 0 24px;
+        }
+        .appbar-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--accent);
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+        }
+        .appbar-count {
+            font-size: 0.9rem;
+            color: #b9c2d3;
+        }
+
+        /* ---------- Layout ---------- */
+        .layout {
+            max-width: 1040px;
+            margin: 28px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+        .panel h2 {
+            margin: 0 0 4px;
+            font-size: 1.15rem;
+        }
+        .panel .hint {
+            margin: 0 0 20px;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .compose {
+            position: sticky;
+            top: 20px;
+        }
+
+        /* ---------- Form (styles the output of form.as_p) ---------- */
+        form p {
+            margin: 0 0 16px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        form input[type="text"],
+        form textarea {
+            width: 100%;
+            padding: 10px 12px;
+            font: inherit;
+            color: var(--ink);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        form input:focus,
+        form textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        /* Validation errors from form.errors */
+        .errorlist {
+            list-style: none;
+            margin: 0 0 8px;
+            padding: 8px 12px;
+            background: var(--danger-soft);
+            color: var(--danger);
+            border-left: 3px solid var(--danger);
+            border-radius: 6px;
+            font-size: 0.88rem;
+        }
+        .errorlist li + li { margin-top: 2px; }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 11px 16px;
+            font: inherit;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        button[type="submit"]:hover { background: var(--accent-dark); }
+        button[type="submit"]:focus-visible {
+            outline: 3px solid var(--accent-soft);
+            outline-offset: 2px;
+        }
+
+        /* ---------- Entries feed ---------- */
+        .feed-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .feed-head h2 { margin: 0; font-size: 1.15rem; }
+        .badge {
+            background: var(--accent-soft);
+            color: var(--accent-dark);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 999px;
+        }
+
+        .entry {
+            display: flex;
+            gap: 14px;
+            padding: 16px 0;
+            border-top: 1px solid var(--line);
+        }
+        .entry:first-of-type { border-top: none; padding-top: 0; }
+
+        .avatar {
+            flex: 0 0 42px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 600;
+        }
+        .entry-body { min-width: 0; }
+        .entry-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 4px 10px;
+        }
+        .entry-name { font-weight: 600; }
+        .entry-time { color: var(--muted); font-size: 0.85rem; }
+        .entry-message {
+            margin: 4px 0 0;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--muted);
+        }
+        .empty strong {
+            display: block;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        /* ---------- Mobile ---------- */
+        @media (max-width: 820px) {
+            .layout { grid-template-columns: 1fr; }
+            .compose { position: static; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="appbar">
+        <div class="appbar-inner">
+            <div class="brand">
+                <span class="brand-mark">&#9998;</span>
+                My Guestbook
+            </div>
+            <div class="appbar-count">{{ entries|length }} entr{{ entries|length|pluralize:"y,ies" }}</div>
+        </div>
+    </header>
+
+    <main class="layout">
+
+        <!-- Left: sign form -->
+        <section class="panel compose">
+            <h2>Sign the guestbook</h2>
+            <p class="hint">Leave your name and a short message.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Sign</button>
+            </form>
+        </section>
+
+        <!-- Right: entries feed -->
+        <section class="panel">
+            <div class="feed-head">
+                <h2>Entries</h2>
+                <span class="badge">{{ entries|length }}</span>
+            </div>
+
+            {% for entry in entries %}
+                <article class="entry">
+                    <div class="avatar">{{ entry.name|first|upper }}</div>
+                    <div class="entry-body">
+                        <div class="entry-meta">
+                            <span class="entry-name">{{ entry.name }}</span>
+                            <span class="entry-time">{{ entry.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                        <p class="entry-message">{{ entry.message }}</p>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty">
+                    <strong>No entries yet</strong>
+                    Be the first to sign using the form.
+                </div>
+            {% endfor %}
+        </section>
+
+    </main>
+
+</body>
+</html>
